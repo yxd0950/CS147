@@ -48,6 +48,13 @@ Ext.setup({
       html: '<h1>Map</h1>',
       cls: 'search'
     });
+    var tweetsPanel = new Ext.Panel({
+          title: 'Tweets',
+          badgeText: '4',
+          html: '<h1>Tweets Tab</h1>',
+          cls: 'buzz',
+          iconCls: 'download'
+        });
     new Ext.TabPanel({
       tabBar: {
         dock: 'bottom',
@@ -70,20 +77,17 @@ Ext.setup({
         title: 'Fairly Guided',
         items: [backButton, {xtype: 'spacer'}, loginButton]
       }],
-      items: [{
-        title: 'Home',
-        html: '<h1>Home</h1><p>Docking tabs to the bottom will automatically change their style. The tabs below are type="light", though the standard type is dark. Badges (like the 4 &amp; Long title below) can be added by setting <code>badgeText</code> when creating a tab/card or by using <code>setBadge()</code> on the tab later.</p>',
-        iconCls: 'info',
-        cls: 'home'
-      },
-      searchPanel,
-      {
-        title: 'Buzz',
-        badgeText: '4',
-        html: '<h1>Buzz Tab</h1>',
-        cls: 'buzz',
-        iconCls: 'download'
-      }]
+      items: [
+        {
+          title: 'Home',
+          //html: '<h1>Home</h1><p>Docking tabs to the bottom will automatically change their style. The tabs below are type="light", though the standard type is dark. Badges (like the 4 &amp; Long title below) can be added by setting <code>badgeText</code> when creating a tab/card or by using <code>setBadge()</code> on the tab later.</p>',
+          iconCls: 'info',
+          cls: 'home',
+          items: [{xtype: 'field', xtype: 'textfield', name: 'foobar', placeHolder: 'Foobar...'}]
+        },
+        searchPanel,
+        tweetsPanel
+      ]
     });
   }
 });
