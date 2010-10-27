@@ -5,6 +5,7 @@
     <title>Tabs 2</title>
     <link rel="stylesheet" href="sencha-touch.css" type="text/css">
     <script type="text/javascript" src="ext-touch.js"></script>    
+    <script type="text/javascript" src="protovis.js"></script>
     <script type="text/javascript" src="index.js"></script>
 
     <style type="text/css" media="screen">
@@ -46,5 +47,23 @@
       }
     </style>
   </head>
-  <body></body>
+  <body>
+    <div style="display:none;">
+      <div id="search-div">
+        <p>Some search stuff...</p>
+      </div>
+      <div id="map-div">
+        <script type="text/javascript">
+          new pv.Panel()
+              .width(150)
+              .height(150)
+            .add(pv.Dot)
+              .data([[.1, 1], [.5, 1.2], [.9, 1.7], [.2, 1.5], [.7, 2.2]])
+              .left(function(d) { return d[0] * 150; })
+              .bottom(function(d) { return d[1] * 50; })
+            .root.render();
+        </script>
+      </div>
+    </div>
+  </body>
 </html>
