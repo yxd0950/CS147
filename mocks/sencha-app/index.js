@@ -4,13 +4,32 @@ Ext.setup({
   phoneStartupScreen: 'phone_startup.png',
   glossOnIcon: false,
   onReady: function() {
+    var textFieldPost = new Ext.form.TextField({
+	name:'textFieldPost',
+	placeHolder:'textFieldPost'
+	});
     var loginButton = new Ext.Button({
       text: 'Login',
-      ui: 'action'
+      ui: 'action',
+      handler: function() {
+	window.location = loginUrl;
+      }
     });
+    var makeAjaxRequest = function() {
+      Ext.getBody().mask(false, '<div class="demos-loading">Loading&hellip;</div>');
+      Ext.Ajax.request({
+         url: 'postTweet.php?tweet='+textFieldPost.getValue()+'&oauth_token='+oauth_token,
+	 method: 'GET',
+         success: function(response, opts) {
+	 alert(response.responseText); 
+         Ext.getBody().unmask();
+      }
+    });
+    };
     var postButton = new Ext.Button({
       text: 'Post',
-      ui: 'action'
+      ui: 'action',
+      handler:makeAjaxRequest
     });
     var backToMapButton = new Ext.Button({
       text: 'Map',
@@ -51,12 +70,12 @@ Ext.setup({
       },{
         dock: 'bottom',
         xtype: 'toolbar',
-        items: [{
+        items: [/*{
           xtype: 'field',
           xtype: 'textfield',
           name: 'post',
           placeHolder: 'Post...'
-        }, postButton]
+        },*/ textFieldPost,postButton]
       }],
       //html: '<h1>Map</h1>',
       items: [
@@ -112,7 +131,7 @@ Ext.setup({
       items: [
         {
           title: 'Home',
-          html: '<h1>Home</h1><p>Docking tabs to the bottom will automatically change their style. The tabs below are type="light", though the standard type is dark. Badges (like the 4 &amp; Long title below) can be added by setting <code>badgeText</code> when creating a tab/card or by using <code>setBadge()</code> on the tab later.</p>',
+          //html: '<h1>Home</h1><p>Docking tabs to the bottom will automatically change their style. The tabs below are type="light", though the standard type is dark. Badges (like the 4 &amp; Long title below) can be added by setting <code>badgeText</code> when creating a tab/card or by using <code>setBadge()</code> on the tab later.</p>',
           iconCls: 'user',
           cls: 'home',
           items: [{
@@ -120,7 +139,7 @@ Ext.setup({
             xtype: 'textfield',
             name: 'foobar',
             placeHolder: 'Foobar...'
-          }]
+          },{contentEl: "home-div"}]
         },
         mapPanel,
         tweetsPanel
