@@ -59,7 +59,16 @@ Ext.setup({
         }, postButton]
       }],
       //html: '<h1>Map</h1>',
-      items: [{contentEl: 'map-div'}],
+      items: [
+      {
+      	xtype: 'button',
+      	text: 'Company Info Placeholder', 
+     	handler: function() {
+        tabPanel.setCard(companyPanel, 'flip');
+        backToMapButton.setVisible(true);
+      	}
+      	},
+      	{contentEl: 'map-div'}],
     });
     /*
     var searchPanel = new Ext.Carousel({
@@ -70,6 +79,10 @@ Ext.setup({
       items: [mapPanel, searchResultsPanel]
     });
     */
+    var companyPanel = new Ext.Panel({
+    	title: 'Company X',
+    	items: [{contentEl: 'company-div'}]
+    });
     var tweetsPanel = new Ext.Panel({
       title: 'Tweets',
       badgeText: '4',
