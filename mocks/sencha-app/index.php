@@ -1,23 +1,21 @@
 <?php
-
 include 'TwitterSearch.php';
+include 'EpiCurl.php';
+include 'EpiOAuth.php';
+include 'EpiTwitter.php';
+include 'config.php';
 
-	include 'EpiCurl.php';
-	include 'EpiOAuth.php';
-	include 'EpiTwitter.php';
-	include 'config.php';
-	 
-	$twitterObj = new EpiTwitter($consumer_key, $consumer_secret);
-	$oauth_token = $_GET['oauth_token'];
-	$loginUrl = $twitterObj->getAuthorizationUrl();
+$twitterObj = new EpiTwitter($consumer_key, $consumer_secret);
+$oauthToken = $_GET['oauth_token'];
+$loginUrl = $twitterObj->getAuthorizationUrl();
 
-	if ($oauth_token != '') {
-		$twitterObj->setToken($oauth_token);
-		$token = $twitterObj->getAccessToken();
-		$twitterObj->setToken($token->oauth_token, $token->oauth_token_secret);
-		setcookie('oauth_token',$token->oauth_token);
-		setcookie('oauth_token_secret', $token->oauth_token_secret);
-	}
+if ($oauthToken != '') {
+  $twitterObj->setToken($oauthToken);
+  $token = $twitterObj->getAccessToken();
+  $twitterObj->setToken($token->oauth_token, $token->oauth_token_secret);
+  setcookie('oauth_token',$token->oauth_token);
+  setcookie('oauth_token_secret', $token->oauth_token_secret);
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -26,10 +24,10 @@ include 'TwitterSearch.php';
     <title>Tabs 2</title>
     <link rel="stylesheet" href="sencha-touch.css" type="text/css">
     <script type="text/javascript">
-	var loginUrl = "<?php echo $loginUrl ?>";
-	var oauth_token = "<?php echo $oauth_token ?>";
+      // For use in following javascript code
+      var $loginUrl = "<?php echo $loginUrl ?>";
+      var $oauthToken = "<?php echo $oauthToken ?>";
     </script>
-
     <script type="text/javascript" src="ext-touch.js"></script>    
     <script type="text/javascript" src="protovis.js"></script>
     <script type="text/javascript" src="index.js"></script>
@@ -76,103 +74,87 @@ include 'TwitterSearch.php';
   <body>
     <div style="display:none;">
       <div id="search-div">
-        <?php 
-    function searchTweets($searchContent) {
-    }
-    $search = new TwitterSearch('stanford');
-    $results = $search->results();
-    echo "<ol>";
-    foreach($results as $value) {
-      echo "<li> $value->text </li>";
-    }
-    echo "</ol>";
-    ?>
+<?php 
+function searchTweets($searchContent) {
+}
+$search = new TwitterSearch('stanford');
+$results = $search->results();
+?>
+        <ol>
+<?php
+foreach($results as $value) {
+?>
+          <li><?php echo $value->text?></li>";
+<?php
+}
+?>
+        </ol>
       </div>
       <div id="company-div">
-        <html>
-    <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title> Welcome to NetApp </title>
-    </head>
-    <h1> NetApp </h1>
-    <body>
-    <table>
-      <tr>
-      <td width="506"><table>
-      <tr>
-        <td width="208"><h3>Company Name ("NetApp")</h3></td>
-      </tr>
-      <tr>
-        <td height="100"><img name="" src="ntap_logo.jpg" width="128" height="128" alt="" /></td>
-        <td width="280"><table>
-        <tr>          
-        <td height="32"><p> NetApp creates innovative products�storage systems and software that help customers around the world store, manage, protect, and retain one of their most precious corporate assets: their data. We are recognized throughout the industry for continually pushing the limits of today�s technology so that our customers never have to choose between saving money and acquiring the capabilities they need to be successful. </p></td>
-        </tr>
-        <tr>
-        <td height="49"><h6><u><a href="http://www.netapp.com"><font color = "blue"> Click Here to Learn More </font></a></u></h6></td>
-        </tr>
-        </</td>
-      </tr>
-      </table>
-    </td>
-    </tr>
-    </table>
-    <h4> Open Positions: </h4>
-    <ul>
-    <li> Sr. Product Manager - Software Licensing</li>
-    <li> Engineering Program Mgr - Product Supportability </li>
-    <li> Senior IT Architect </li>
-    <li> Software Engineer </li>
-    </ul>
-    </body>
-    </html>
-        <p>Some search stuff...</p>
+        <h1> NetApp </h1>
+        <table>
+          <tr>
+            <td width="506">
+              <table>
+                <tr>
+                  <td width="208"><h3>Company Name ("NetApp")</h3></td>
+                </tr>
+                <tr>
+                  <td height="100"><img name="" src="ntap_logo.jpg" width="128" height="128" alt="" /></td>
+                  <td width="280">
+                    <table>
+                      <tr>
+                        <td height="32"><p> NetApp creates innovative products�storage systems and software that help customers around the world store, manage, protect, and retain one of their most precious corporate assets: their data. We are recognized throughout the industry for continually pushing the limits of today�s technology so that our customers never have to choose between saving money and acquiring the capabilities they need to be successful.</p></td>
+                      </tr>
+                      <tr>
+                        <td height="49"><h6><u><a href="http://www.netapp.com"><font color = "blue"> Click Here to Learn More </font></a></u></h6></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+        <h4>Open Positions:</h4>
+        <ul>
+          <li> Sr. Product Manager - Software Licensing</li>
+          <li> Engineering Program Mgr - Product Supportability </li>
+          <li> Senior IT Architect </li>
+          <li> Software Engineer </li>
+        </ul>
       </div>
       <div id="map-div">
         <script type="text/javascript">
-          new pv.Panel()
-              .width(150)
-              .height(150)
-            .add(pv.Dot)
-              .data([[.1, 1], [.5, 1.2], [.9, 1.7], [.2, 1.5], [.7, 2.2]])
-              .left(function(d) { return d[0] * 150; })
-              .bottom(function(d) { return d[1] * 50; })
-            .root.render();
+        new pv.Panel()
+          .width(150)
+          .height(150)
+          .add(pv.Dot)
+          .data([[.1, 1], [.5, 1.2], [.9, 1.7], [.2, 1.5], [.7, 2.2]])
+          .left(function(d) { return d[0] * 150; })
+          .bottom(function(d) { return d[1] * 50; })
+          .root.render();
         </script>
       </div>
       <div id="home-div">
-	<?php 
-	//session_start();
-	 if($oauth_token == '')
-	 {
-	 echo "<div style='width:200px;margin-top:200px;margin-left:auto;margin-right:auto'>";
-	 echo "<a href='$loginUrl'>Sign In with Twitter</a>";
-	 echo "</div>";
-	 }
-	 else
-	 {
-	 $twitterInfo= $twitterObj->get_accountVerify_credentials();
-	 $twitterInfo->response;
-	 
-	 $username = $twitterInfo->screen_name;
-	 $profilepic = $twitterInfo->profile_image_url;
-	 
-	 include 'update.php';
-	 
-	 }
-	/*	 
-	if(isset($_POST['submit']))
-	 {
-	 $msg = $_REQUEST['tweet'];
-	 
-	 $twitterObj->setToken($_SESSION['ot'], $_SESSION['ots']);
-	 $update_status = $twitterObj->post_statusesUpdate(array('status' => $msg));
-	 $temp = $update_status->response;
-	 
- echo "<div align='center'>Updated your Timeline Successfully .</div>";
- }*/
+<?php 
+if($oauthToken == '') {
 ?>
-	</div>
+        <div style='width:200px;margin-top:200px;margin-left:auto;margin-right:auto'>
+          <a href='$loginUrl'>Sign In with Twitter</a>
+        </div>
+<?php
+} else {
+  $twitterInfo= $twitterObj->get_accountVerify_credentials();
+  $twitterInfo->response;
+
+  $username = $twitterInfo->screen_name;
+  $profilePic = $twitterInfo->profile_image_url;
+
+  include 'update.php';
+}
+?>
+      </div>
     </div>
   </body>
 </html>
