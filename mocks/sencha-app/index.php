@@ -140,8 +140,8 @@ foreach($results as $value) {
 <?php 
 if($oauthToken == '') {
 ?>
-        <div style='width:200px;margin-top:200px;margin-left:auto;margin-right:auto'>
-          <a href='$loginUrl'>Sign In with Twitter</a>
+        <div style="width:200px;margin-top:200px;margin-left:auto;margin-right:auto">
+          <a href="<?php echo $loginUrl ?>">Sign In with Twitter</a>
         </div>
 <?php
 } else {
