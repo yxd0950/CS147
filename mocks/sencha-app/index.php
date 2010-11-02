@@ -21,17 +21,20 @@ if ($oauthToken != '') {
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">  
-    <title>Tabs 2</title>
+    <title>Fairly Guided</title>
     <link rel="stylesheet" href="sencha-touch.css" type="text/css">
     <script type="text/javascript">
       // For use in following javascript code
       var $loginUrl = "<?php echo $loginUrl ?>";
       var $oauthToken = "<?php echo $oauthToken ?>";
     </script>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.4.3.min.js"></script>    
     <script type="text/javascript" src="ext-touch.js"></script>    
     <script type="text/javascript" src="protovis.js"></script>
+    <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=true"></script>
+    <script type="text/javascript" src="companies.js"></script>
     <script type="text/javascript" src="index.js"></script>
-
+    <script type="text/javascript" src="infobox.js"></script>    
     <style type="text/css" media="screen">
       body {
         background-color: #333;
@@ -124,22 +127,16 @@ foreach($results as $value) {
           <li> Software Engineer </li>
         </ul>
       </div>
-      <div id="map-div">
-        <script type="text/javascript">
-        new pv.Panel()
-          .width(150)
-          .height(150)
-          .add(pv.Dot)
-          .data([[.1, 1], [.5, 1.2], [.9, 1.7], [.2, 1.5], [.7, 2.2]])
-          .left(function(d) { return d[0] * 150; })
-          .bottom(function(d) { return d[1] * 50; })
-          .root.render();
-        </script>
-      </div>
       <div id="home-div">
 <?php 
 if($oauthToken == '') {
 ?>
+        <p id="location"></p>
+        <script type="text/javascript">
+          navigator.geolocation.getCurrentPosition(function(pos) {
+            $('#location').text('Your location: ' + pos.coords.latitude + ',' + pos.coords.longitude);
+          });
+        </script>
         <div style="width:200px;margin-top:200px;margin-left:auto;margin-right:auto">
           <a href="<?php echo $loginUrl ?>">Sign In with Twitter</a>
         </div>
