@@ -5,8 +5,9 @@ Ext.setup({
   glossOnIcon: false,
 
   onReady: function() {
-    var textFieldPost = new Ext.form.TextField({
-      name:'textFieldPost',
+    var postField = new Ext.form.TextField({
+      name:'postField',
+      //showClear: true,
       placeHolder:'Say something...'
     });
 
@@ -14,32 +15,35 @@ Ext.setup({
       name:'textFieldSearch',
       placeHolder:'Search Tweets'
     });
-
     var loginButton = new Ext.Button({
-      text: 'Login',
-      ui: 'action',
+      text: $loginOrOut,
+      //ui: 'action',
       handler: function() {
-        window.location = $loginUrl; // $loginUrl available from html/php page
+        if ($loginOrOut == "Login") window.location = $loginUrl;
+        else window.location = $logoutUrl;
       }
     });
 
-    var makeAjaxRequest = function() {
-      console.log("enteredAjax");
-      Ext.getBody().mask(false, '<div class="demos-loading">Loading&hellip;</div>');
-      Ext.Ajax.request({
-        url: 'postTweet.php?tweet=' + textFieldPost.getValue() + '&oauth_token=' + $oauthToken,
-        method: 'GET',
-        success: function(response, opts) {
-          alert(response.responseText); 
-          Ext.getBody().unmask();
-        }
-      });
+    var postAjaxRequest = function() {
+      if ($loginOrOut == "Login") {
+        alert("Sorry, anonymous posting coming soon (waiting on twitter...). For now, please login before posting.");
+      } else {
+        Ext.getBody().mask(false, '<div class="demos-loading">Loading&hellip;</div>');
+        Ext.Ajax.request({
+          url: 'postTweet.php?tweet=' + postField.getValue() + '&oauth_token=' + $oauthToken,
+          method: 'GET',
+          success: function(response, opts) {
+            alert(response.responseText);
+            Ext.getBody().unmask();
+          }
+        });
+      }
     };
 
     var postButton = new Ext.Button({
       text: 'Post',
-      ui: 'action',
-      handler:makeAjaxRequest
+      //ui: 'action',
+      handler:postAjaxRequest
     });
 
     var backToMapButton = new Ext.Button({
@@ -47,7 +51,7 @@ Ext.setup({
       ui: 'back',
       hidden: true,
       handler: function() {
-        tabPanel.setCard(map, 'flip');
+        tabPanel.setActiveItem(map, 'flip');
         backToMapButton.setVisible(false);
       }
     });
@@ -57,8 +61,8 @@ Ext.setup({
       ui: 'back',
       hidden: true,
       handler: function() {
-        makeAjaxSearchRequest();
-        tabPanel.setCard(tweetsPanel, 'flip');
+        searchAjaxRequest();
+        tabPanel.setActiveItem(tweetsPanel, 'cube');
         backToTweetsButton.setVisible(false);
       }
     });
@@ -67,47 +71,62 @@ Ext.setup({
       items: [{contentEl: 'search-div'}]
     });
 
-    var makeAjaxSearchRequest = function() {
+    var searchAjaxRequest = function() {
       Ext.getBody().mask(false, '<div class="demos-loading">Loading&hellip;</div>');
-      if (!textFieldSearch.getValue()) {
+      if (!searchField.getValue()) {
         backToTweetsButton.setVisible(false);
-        console.log("invalid search value");
-      } else if (textFieldSearch.getValue().length > 0) {
+      } else if (searchField.getValue().length > 0) {
         backToTweetsButton.setVisible(true);
-        console.log("valid search value");
       }
       Ext.Ajax.request({
-        url: 'searchTweets.php?search='+textFieldSearch.getValue(), method: 'GET',
+        url: 'searchTweets.php?search=' + searchField.getValue(), method: 'GET',
         success:function(response, opts) {
-          console.log(response.responseText);
           document.getElementById('tweet-div').innerHTML = response.responseText;
           Ext.getBody().unmask();
         }
       });
+    }
+
+    var searchHandler = function() {
+      if (tabPanel.getActiveItem() == map) {
+        Ext.getBody().mask(false, '<div class="demos-loading">Loading&hellip;</div>');
+        initMarkers(searchField.getValue());
+        Ext.getBody().unmask();
+      } else {
+        searchAjaxRequest();
+        tabPanel.setActiveItem(tweetsPanel, 'cube');
+        searchField.setValue('');
+      }
     };
 
     var searchButton = new Ext.Button({
       text: 'Go',
-      ui: 'action',
-      handler: function() {
-        makeAjaxSearchRequest();
-        tabPanel.setCard(tweetsPanel, 'flip');
-       textFieldSearch.setValue('');
-      }
+      //ui: 'action',
+      handler: searchHandler
     });
 
     var centerLat = 37.429440;
     var centerLng = -122.172783;
+    var defaultZoom = 18;
 
     var map = new Ext.Map({
-      iconCls: 'search',
+      iconCls: 'maps',
       title: 'Map',
       mapOptions: {
         center: new google.maps.LatLng(centerLat, centerLng),
-        zoom: 19,
+        zoom: defaultZoom,
         mapTypeId: google.maps.MapTypeId.ROADMAP,
         navigationControl: false,
         disableDefaultUI: true
+      }
+    });
+
+    var searchField = new Ext.form.TextField({
+      name:'searchField',
+      placeHolder:'Search...',
+      //showClear: true,
+      listeners: {
+        change: searchHandler
       }
     });
 
@@ -115,25 +134,8 @@ Ext.setup({
       dock: 'top',
       title: 'Search',
       cls: 'search',
-      dockedItems: [
-        {
-          dock: 'top',
-          xtype: 'toolbar',
-          items: [textFieldSearch, searchButton]
-        },
-        {
-          dock: 'bottom',
-          xtype: 'toolbar',
-          items: [textFieldPost, postButton]
-        }
-      ],
       items: [
-        {
-          xtype: 'field',
-          xtype: 'textfield',
-          name: 'search',
-          placeHolder: 'Search...'
-        },
+        searchField,
         searchButton
       ]
     });
@@ -141,21 +143,21 @@ Ext.setup({
     var postBar = new Ext.Toolbar({
       dock: 'bottom',
       items: [
-        textFieldPost,
+        postField,
         postButton
       ]
     });
 
-    var mapSearchToggle = new Ext.Button({
+    var searchToggle = new Ext.Button({
       text: 'Search...',
-      ui: 'action',
+      //ui: 'action',
       handler: function() {
         if (tabPanel.getDockedItems().indexOf(searchBar) > -1) {
           tabPanel.removeDocked(searchBar, false);
-          mapSearchToggle.setText('Search...');
+          searchToggle.setText('Search...');
         } else {
           tabPanel.addDocked(searchBar);
-          mapSearchToggle.setText('Hide Search');
+          searchToggle.setText('Hide Search');
         }
       }
     });
@@ -177,7 +179,7 @@ Ext.setup({
       items: [
         backToMapButton,
         backToTweetsButton,
-        mapSearchToggle,
+        searchToggle,
         {xtype: 'spacer'},
         loginButton
       ]
@@ -189,8 +191,7 @@ Ext.setup({
         layout: {pack: 'center'}
       },
       fullscreen: true,
-      ui: 'light',
-      animation: 'cube',
+      cardSwitchAnimation: 'cube',
       defaults: {
         scroll: 'vertical'
       },
@@ -202,21 +203,19 @@ Ext.setup({
           title: 'Home',
           iconCls: 'user',
           cls: 'home',
-          items: [
-            {contentEl: "home-div"}
-          ]
+          items: [{contentEl: "home-div"}]
         },
         map,
         tweetsPanel
-      ], 
+      ],
       listeners: {
         beforecardswitch: function(container, newCard, oldCard, index, animated) {
           if (newCard == tweetsPanel) {
-            console.log('hi');
-            makeAjaxSearchRequest();
+            searchAjaxRequest();
           }
+          tabPanel.removeDocked(searchBar, false);
+          searchToggle.setText('Search...');
         }
-
       }
     });
 
@@ -231,40 +230,71 @@ Ext.setup({
         lng = pv.Scale.linear(0, 1).range(minLng, maxLng);
 
     var labels = [];
-    companies.slice(0, 20).forEach(function(c) {
-      var newLatLng = new google.maps.LatLng(lat(Math.random()), lng(Math.random()));
-      var marker = new google.maps.Marker({
-        position: newLatLng,
-        map: map.map,
-        title: c.name
+    var markers = [];
+    var initMarkers = function(search_terms) {
+      markers.forEach(function(m) {
+        m.setMap(null);
       });
-      var label = new InfoBox({
-        content: c.name,
-        boxStyle: {
-          border: "1px solid black",
-          backgroundColor: "white",
-          padding: "3px",
-          textAlign: "center",
-          fontSize: "10px",
-          width: "56px"
-        },
-        disableAutoPan: true,
-        pixelOffset: new google.maps.Size(-28, 0),
-        position: newLatLng,
-        closeBoxURL: "",
-        isHidden: true,
-        pane: "mapPane",
-        enableEventPropagation: true
+      labels.forEach(function(l) {
+        l.close();
       });
-      label.open(map.map);
-      labels.push(label);
-      var info = new google.maps.InfoWindow({
-        content: c.name + ' details...'
+      var active_companies = [];
+      if (search_terms && (search_terms = search_terms.trim()).length > 0) {
+        search_terms = search_terms.split(/ +/);
+        $.grep(companies, function(company, index) {
+          var matches = false;
+          search_terms.forEach(function(t) {
+            var regex = new RegExp(t, 'i');
+            if (!matches && company.name.match(regex)) matches = true;
+            if (!matches) {
+              company.majors.forEach(function(m) {
+                if (m.match(regex)) matches = true;
+              });
+            }
+          });
+          if (matches) active_companies.push(company);
+        });
+      } else {
+        active_companies = companies.slice(0);
+      }
+      active_companies.slice(0, 20).forEach(function(c) {
+        var newLatLng = new google.maps.LatLng(lat(Math.random()), lng(Math.random()));
+        var marker = new google.maps.Marker({
+          position: newLatLng,
+          map: map.map,
+          title: c.name
+        });
+        markers.push(marker);
+        var label = new InfoBox({
+          content: c.name,
+          boxStyle: {
+            border: "1px solid #333",
+            backgroundColor: "black",
+            color: "white",
+            padding: "3px",
+            textAlign: "center",
+            fontSize: "10px",
+            width: "56px"
+          },
+          disableAutoPan: true,
+          pixelOffset: new google.maps.Size(-28, 0),
+          position: newLatLng,
+          closeBoxURL: "",
+          isHidden: tabPanel.getActiveItem() != map ? true : false,
+          pane: "mapPane",
+          enableEventPropagation: true
+        });
+        label.open(map.map);
+        labels.push(label);
+        google.maps.event.addListener(marker, 'click', function() {
+          $('#company-name').text(marker.title);
+          tabPanel.setActiveItem(companyPanel, 'flip');
+        });
       });
-      google.maps.event.addListener(marker, 'click', function() {
-        info.open(map.map, marker);
-      });
-    });
+      map.map.setCenter(new google.maps.LatLng(centerLat, centerLng));
+      map.map.setZoom(defaultZoom);
+    };
+    initMarkers();
 
     map.addListener('activate', function() {
       labels.forEach(function(l) {
