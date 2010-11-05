@@ -23,6 +23,7 @@ if ($oauthToken != '') {
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">  
     <title>Tabs 2</title>
     <link rel="stylesheet" href="sencha-touch.css" type="text/css">
+    <link rel="stylesheet" href="app.css" type="text/css">
     <script type="text/javascript">
       // For use in following javascript code
       var $loginUrl = "<?php echo $loginUrl ?>";
@@ -90,6 +91,12 @@ foreach($results as $value) {
 ?>
         </ol>
       </div>
+      
+      <div id="tweet-div">
+
+      </div>
+      
+      
       <div id="company-div">
         <h1> NetApp </h1>
         <table>

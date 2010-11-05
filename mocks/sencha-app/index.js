@@ -9,7 +9,10 @@ Ext.setup({
       name:'textFieldPost',
       placeHolder:'textFieldPost'
     });
-
+	var textFieldSearch = new Ext.form.TextField({
+	name:'textFieldSearch',
+	placeHolder:'Search Tweets'
+	});
     var loginButton = new Ext.Button({
       text: 'Login',
       ui: 'action',
@@ -19,6 +22,7 @@ Ext.setup({
     });
 
     var makeAjaxRequest = function() {
+      console.log("enteredAjax");
       Ext.getBody().mask(false, '<div class="demos-loading">Loading&hellip;</div>');
       Ext.Ajax.request({
         url: 'postTweet.php?tweet=' + textFieldPost.getValue() + '&oauth_token=' + $oauthToken,
@@ -45,17 +49,46 @@ Ext.setup({
         backToMapButton.setVisible(false);
       }
     });
+    
+    var backToTweetsButton = new Ext.Button({
+      text: 'Back',
+      ui: 'back',
+      hidden: true,
+      handler: function() {
+      	makeAjaxSearchRequest();
+        tabPanel.setCard(tweetsPanel, 'flip');
+        backToTweetsButton.setVisible(false);
+      }
+    });
 
     var searchResultsPanel = new Ext.Panel({
       items: [{contentEl: 'search-div'}]
     });
-
+	var makeAjaxSearchRequest = function() {
+		Ext.getBody().mask(false, '<div class="demos-loading">Loading&hellip;</div>');
+		if (!textFieldSearch.getValue()) {
+			backToTweetsButton.setVisible(false);
+			console.log("invalid search value");
+		} else if (textFieldSearch.getValue().length > 0) {
+			backToTweetsButton.setVisible(true);
+			console.log("valid search value");
+		}
+		Ext.Ajax.request({
+			url: 'searchTweets.php?search='+textFieldSearch.getValue(), method: 'GET',
+			success:function(response, opts) {
+				console.log(response.responseText);
+				document.getElementById('tweet-div').innerHTML = response.responseText;
+				Ext.getBody().unmask();
+			}
+		});
+	};
     var searchButton = new Ext.Button({
       text: 'Search',
       ui: 'action',
       handler: function() {
-        tabPanel.setCard(searchResultsPanel, 'flip');
-        backToMapButton.setVisible(true);
+      	makeAjaxSearchRequest();
+        tabPanel.setCard(tweetsPanel, 'flip');
+   		textFieldSearch.setValue('');
       }
     });
 
@@ -67,15 +100,7 @@ Ext.setup({
         {
           dock: 'top',
           xtype: 'toolbar',
-          items: [
-            {
-              xtype: 'field',
-                xtype: 'textfield',
-                name: 'search',
-                placeHolder: 'Search...'
-            },
-            searchButton
-          ]
+          items: [textFieldSearch, searchButton]
         },
         {
           dock: 'bottom',
@@ -104,9 +129,9 @@ Ext.setup({
     var tweetsPanel = new Ext.Panel({
       title: 'Tweets',
       badgeText: '4',
-      html: '<h1>Tweets Tab</h1>',
       cls: 'buzz',
-      iconCls: 'team'
+      iconCls: 'team',
+	  items: [{contentEl: 'tweet-div'}]
     });
 
     var tabPanel = new Ext.TabPanel({
@@ -127,6 +152,7 @@ Ext.setup({
           title: 'Fairly Guided',
           items: [
             backToMapButton,
+            backToTweetsButton,
             {xtype: 'spacer'},
             loginButton
           ]
@@ -149,7 +175,16 @@ Ext.setup({
         },
         mapPanel,
         tweetsPanel
-      ]
+      ], 
+      listeners: {
+      	beforecardswitch: function(container, newCard, oldCard, index, animated) {
+      		if (newCard == tweetsPanel) {
+      			console.log('hi');
+      			makeAjaxSearchRequest();
+      		}
+      	}
+      	
+      }
     });
   }
 });
