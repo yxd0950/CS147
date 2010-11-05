@@ -1,0 +1,22 @@
+.tweet-bubble > div {
+min-height:100px;
+-webkit-border-radius:4px;
+}
+
+.x-tweetanchor {
+width:14px;
+height:14px;
+background-color:#eee;
+top:10px;
+left:68px;
+position:absolute;
+-webkit-transform:rotate(45deg);
+}
+
+.tweet-content {
+z-index:1;
+background:#eee;
+color:#444;
+text-shadow:#fff 0 1px 0;
+padding:15px;
+}
