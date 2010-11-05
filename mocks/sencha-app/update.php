@@ -1,6 +1,5 @@
-<div>
-  <h1>Hello, and Welcome!</h1>
-  <p>Twitter Handle: <?php echo $username ?></p>
-  <p>Profile Picture:</p>
-  <p><img src="<?php echo $profilePic ?>"/></p>
+<?php $_SESSION['twitter_profile']; ?>
+<div id="twitterProfileDiv"><!--Start form-->
+  <p>Twitter Username: <?php echo $username ?></p>
+  <p>Profile Picture: <br /><?php echo "<img src='$profilepic' />" ?><br /></p>
 </div>

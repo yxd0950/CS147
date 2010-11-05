@@ -6,28 +6,32 @@ Ext.setup({
 
   onReady: function() {
     var textFieldPost = new Ext.form.TextField({
-      name:'textFieldPost',
-      placeHolder:'Say something...'
-    });
-
+	name:'textFieldPost',
+	placeHolder:'textFieldPost',
+	maxLength:'133'
+	});
     var loginButton = new Ext.Button({
-      text: 'Login',
+      text: loginOrOut,
       ui: 'action',
       handler: function() {
-        window.location = $loginUrl; // $loginUrl available from html/php page
+	if (loginOrOut == "Login")
+	window.location = loginUrl;
+	else 
+	window.location = logoutUrl;
       }
     });
 
     var makeAjaxRequest = function() {
+      var hashtag = "#SFJF10"
       Ext.getBody().mask(false, '<div class="demos-loading">Loading&hellip;</div>');
       Ext.Ajax.request({
-        url: 'postTweet.php?tweet=' + textFieldPost.getValue() + '&oauth_token=' + $oauthToken,
-        method: 'GET',
-        success: function(response, opts) {
-          alert(response.responseText); 
-          Ext.getBody().unmask();
-        }
-      });
+         url: 'postTweet.php?tweet='+textFieldPost.getValue()+'&oauth_token='+oauth_token,
+	 method: 'GET',
+         success: function(response, opts) {
+	 alert(response.responseText); 
+         Ext.getBody().unmask();
+      }
+    });
     };
 
     var postButton = new Ext.Button({
@@ -150,9 +154,7 @@ Ext.setup({
           title: 'Home',
           iconCls: 'user',
           cls: 'home',
-          items: [
-            {contentEl: "home-div"}
-          ]
+          items: [{contentEl: "home-div"}]
         },
         map,
         tweetsPanel
