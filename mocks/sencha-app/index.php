@@ -97,48 +97,18 @@ foreach($results as $value) {
 ?>
         </ol>
       </div>
-      
-      <div id="tweet-div">
 
+      <div id="tweet-div">
       </div>
-      
-      
+
       <div id="company-div">
-        <p id="company-name"></p>
-        <!--
-        <h1> NetApp </h1>
-        <table>
-          <tr>
-            <td width="506">
-              <table>
-                <tr>
-                  <td width="208"><h3>Company Name ("NetApp")</h3></td>
-                </tr>
-                <tr>
-                  <td height="100"><img name="" src="ntap_logo.jpg" width="128" height="128" alt="" /></td>
-                  <td width="280">
-                    <table>
-                      <tr>
-                        <td height="32"><p> NetApp creates innovative products�storage systems and software that help customers around the world store, manage, protect, and retain one of their most precious corporate assets: their data. We are recognized throughout the industry for continually pushing the limits of today�s technology so that our customers never have to choose between saving money and acquiring the capabilities they need to be successful.</p></td>
-                      </tr>
-                      <tr>
-                        <td height="49"><h6><u><a href="http://www.netapp.com"><font color = "blue"> Click Here to Learn More </font></a></u></h6></td>
-                      </tr>
-                    </table>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-        </table>
-        <h4>Open Positions:</h4>
-        <ul>
-          <li> Sr. Product Manager - Software Licensing</li>
-          <li> Engineering Program Mgr - Product Supportability </li>
-          <li> Senior IT Architect </li>
-          <li> Software Engineer </li>
-        </ul>
-        -->
+        <h3 id="company-name"></h3>
+        <h4>Position types:</h4>
+        <ul id="company-positions"></ul>
+        <h4>Majors of interest:</h4>
+        <ul id="company-majors"></ul>
+        <h4>Degrees of interest</h4>
+        <ul id="company-degrees"></ul>
       </div>
       <div id="home-div">
 <?php
