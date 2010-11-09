@@ -123,7 +123,7 @@ Ext.setup({
 
     var searchField = new Ext.form.TextField({
       name:'searchField',
-      placeHolder:'Search...',
+      placeHolder:'Search',
       //showClear: true,
       listeners: {
         change: searchHandler
@@ -141,38 +141,49 @@ Ext.setup({
     });
 
     var postBar = new Ext.Toolbar({
-      dock: 'bottom',
+      dock: 'top',
+      title:'Post',
+      cls:'post',
       items: [
         postField,
         postButton
       ]
     });
 
-    var searchToggle = new Ext.Button({
-      text: 'Search...',
-      //ui: 'action',
-      handler: function() {
+      var searchToggleHandler = function() {
         if (tabPanel.getDockedItems().indexOf(searchBar) > -1) {
           tabPanel.removeDocked(searchBar, false);
-          searchToggle.setText('Search...');
         } else {
+          tabPanel.removeDocked(postBar, false);
           tabPanel.addDocked(searchBar);
-          searchToggle.setText('Hide Search');
         }
       }
-    });
+    ;
+
+    var postToggleHandler = function() {
+        if (tabPanel.getDockedItems().indexOf(postBar) > -1) {
+          tabPanel.removeDocked(postBar, false);
+        } else {
+          tabPanel.removeDocked(searchBar, false);
+          tabPanel.addDocked(postBar);
+        }
+      }
+    ;
+    var buttonGroup = [{
+	xtype:'segmentedbutton',
+	allowDepress:'true',
+	items:[{
+		text:'Search',
+		handler:searchToggleHandler
+		},{
+		text:'Post',
+		handler:postToggleHandler
+	      }]
+	}];
 
     var companyPanel = new Ext.Panel({
-      floating: true,
-      modal: true,
-      centered: true,
-      width: Ext.is.Phone ? 260 : 400,
-      height: Ext.is.Phone ? 260 : 400,
-      styleHtmlContent: true,
-      scroll: 'vertical',
-      cls: 'htmlcontent',
       title: 'Company X',
-      contentEl: 'company-div'
+      items: [{contentEl: 'company-div'}]
     });
 
     var tweetsPanel = new Ext.Panel({
@@ -187,7 +198,7 @@ Ext.setup({
       items: [
         backToMapButton,
         backToTweetsButton,
-        searchToggle,
+	buttonGroup,
         {xtype: 'spacer'},
         loginButton
       ]
@@ -210,9 +221,8 @@ Ext.setup({
         {
           title: 'Home',
           iconCls: 'user',
-          styleHtmlContent: true,
-          cls: 'htmlcontent',
-          contentEl: 'home-div'
+          cls: 'home',
+          items: [{contentEl: "home-div"}]
         },
         map,
         tweetsPanel
@@ -223,12 +233,9 @@ Ext.setup({
             searchAjaxRequest();
           }
           tabPanel.removeDocked(searchBar, false);
-          searchToggle.setText('Search...');
         }
       }
     });
-
-    tabPanel.addDocked(postBar);
 
     var minLat = 37.429112,
         maxLat = 37.429515,
@@ -250,7 +257,7 @@ Ext.setup({
       var active_companies = [];
       if (search_terms && (search_terms = search_terms.trim()).length > 0) {
         search_terms = search_terms.split(/ +/);
-        active_companies = $.grep(companies, function(company, index) {
+        $.grep(companies, function(company, index) {
           var matches = false;
           search_terms.forEach(function(t) {
             var regex = new RegExp(t, 'i');
@@ -261,25 +268,19 @@ Ext.setup({
               });
             }
           });
-          if (matches && company.logo_url) return true;
-          return false;
+          if (matches) active_companies.push(company);
         });
       } else {
-        active_companies = $.grep(companies, function(company, index) {
-          if (company.logo_url) return true;
-          return false;
-        });
+        active_companies = companies.slice(0);
       }
-      active_companies.forEach(function(c) {
+      active_companies.slice(0, 20).forEach(function(c) {
         var newLatLng = new google.maps.LatLng(lat(Math.random()), lng(Math.random()));
         var marker = new google.maps.Marker({
           position: newLatLng,
           map: map.map,
-          icon: new google.maps.MarkerImage("company_images/" + c.logo_url),
           title: c.name
         });
         markers.push(marker);
-        /*
         var label = new InfoBox({
           content: c.name,
           boxStyle: {
@@ -301,24 +302,9 @@ Ext.setup({
         });
         label.open(map.map);
         labels.push(label);
-        */
         google.maps.event.addListener(marker, 'click', function() {
           $('#company-name').text(marker.title);
-          var company = $.grep(companies, function(c) { return c.name == marker.title; })[0]
-          $('#company-majors').empty();
-          company.majors.forEach(function(m) {
-            $('#company-majors').append('<li>' + m + '</li>');
-          });
-          $('#company-positions').empty();
-          company.position_types.forEach(function(p) {
-            $('#company-positions').append('<li>' + p + '</li>');
-          });
-          $('#company-degrees').empty();
-          company.degree_level.forEach(function(d) {
-            $('#company-degrees').append('<li>' + d + '</li>');
-          });
-          //tabPanel.setActiveItem(companyPanel, 'flip');
-          companyPanel.show();
+          tabPanel.setActiveItem(companyPanel, 'flip');
         });
       });
       map.map.setCenter(new google.maps.LatLng(centerLat, centerLng));
