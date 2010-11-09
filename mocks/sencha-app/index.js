@@ -244,9 +244,12 @@ Ext.setup({
       markers.forEach(function(m) {
         m.setMap(null);
       });
+      markers = [];
+      /*
       labels.forEach(function(l) {
         l.close();
       });
+      */
       var active_companies = [];
       if (search_terms && (search_terms = search_terms.trim()).length > 0) {
         search_terms = search_terms.split(/ +/);
