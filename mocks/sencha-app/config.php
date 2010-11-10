@@ -1,4 +1,4 @@
 <?php
-$consumer_key = 'YcHwJUAUHne3Wxu5vMYXg';
-$consumer_secret = 'JUzMPlRxseA4qTTg6MR6xwcZMlr9IWxWuxxXI8hOc';
+$consumer_key = 'QtRUlQrBIFIs5P3qGUNCQ';
+$consumer_secret = 'GphRVmQqKl3nAjc45hy4OpvyUPMy98YJGOlI6GuOVA';
 ?>
