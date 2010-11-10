@@ -11,12 +11,16 @@ $loginUrl = $twitterObj->getAuthorizationUrl();
 
 if ($oauthToken != '') {
   $loginOrOut = 'Logout';//logout out
+  $isLoggedIn = true;
   $twitterObj->setToken($oauthToken);
   $token = $twitterObj->getAccessToken();
   $twitterObj->setToken($token->oauth_token, $token->oauth_token_secret);
   setcookie('oauth_token',$token->oauth_token);
   setcookie('oauth_token_secret', $token->oauth_token_secret);
-} else $loginOrOut = 'Login';//login
+} else {
+  $loginOrOut = 'Login with Twitter';//login
+  $isLoggedIn = false;
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -31,6 +35,7 @@ if ($oauthToken != '') {
       var $logoutUrl = "logout.php";
       var $oauthToken = "<?php echo $oauthToken ?>";
       var $loginOrOut = "<?php echo $loginOrOut ?>";
+      var $isLoggedIn = <?php echo $isLoggedIn ? 'true' : 'false' ?>;
     </script>
     <script type="text/javascript" src="http://code.jquery.com/jquery-1.4.3.min.js"></script>
     <script type="text/javascript" src="sencha-touch.js"></script>
@@ -103,9 +108,9 @@ foreach($results as $value) {
 
       <div id="company-div">
         <h3 id="company-name"></h3>
-        <h4>Position types:</h4>
+        <h4>Position types</h4>
         <ul id="company-positions"></ul>
-        <h4>Majors of interest:</h4>
+        <h4>Majors of interest</h4>
         <ul id="company-majors"></ul>
         <h4>Degrees of interest</h4>
         <ul id="company-degrees"></ul>
@@ -113,28 +118,16 @@ foreach($results as $value) {
       <div id="home-div">
 <?php
 if($oauthToken == '') {
-	echo '<p style="text-align:left">Anonymous User</p>';
-	 }
-	 else
-	 {
-	 $twitterInfo= $twitterObj->get_accountVerify_credentials();
-	 $twitterInfo->response;
-	 
-	 $username = $twitterInfo->screen_name;
-	 $profilepic = $twitterInfo->profile_image_url;
-	 
-	 include 'update.php';
-
-	 
-	 }
-	 include 'CareerFair.php';
+  echo '<p style="font-variant:small-caps;color:grey;">You are logged in Anonymously</p>';
+} else {
+  $twitterInfo= $twitterObj->get_accountVerify_credentials();
+  $twitterInfo->response;
+  $username = $twitterInfo->screen_name;
+  $profilepic = $twitterInfo->profile_image_url;
+  include 'update.php';
+}
+include 'CareerFair.php';
 ?>
-        <p id="location"></p>
-        <script type="text/javascript">
-          navigator.geolocation.getCurrentPosition(function(pos) {
-            $('#location').text('Your location: ' + pos.coords.latitude + ',' + pos.coords.longitude);
-          });
-        </script>
       </div>
     </div>
   </body>
