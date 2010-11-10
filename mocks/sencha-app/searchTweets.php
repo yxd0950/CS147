@@ -9,7 +9,7 @@
 			$results = $search->with('SFJF10')->results();
 		} else {
 			$search = new TwitterSearch($searchText);
-			$results = $search->results();
+			$results = $search->with('SFJF10')->results();
 		}
 	}
 	
