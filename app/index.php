@@ -24,6 +24,7 @@ if ($oauthToken != '') {
 ?>
 <!DOCTYPE html>
 <html>
+
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>Fairly Guided</title>
@@ -130,6 +131,9 @@ if ($oauthToken != '') {
     </style>
   </head>
   <body>
+<?php
+	include_once("analyticstracking.php")
+?>
     <div style="display:none;">
       <div id="search-div">
 <?php

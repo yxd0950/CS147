@@ -31,7 +31,14 @@ var postField = undefined,
     externalLinks = undefined,
     labels = undefined,
     markers = undefined,
-    tabPanel = undefined;
+    tabPanel = undefined,
+    AnonymousPosting = "AP",
+    RegularPosting = "RP",
+    MapZoom = "MZ",
+    SearchCompany = "SC",
+    BirdIcon = "BI",
+    BottomTweetButton = "BTB",
+    CompanyList = "CL";
 
 Ext.setup({
   icon: 'icon.png',
@@ -49,14 +56,7 @@ Ext.setup({
       placeHolder: $isLoggedIn ? 'Tweet something...' : 'Tweet anonymously...'
     });
 
-    postBubbleField = new Ext.form.Text({
-      name:'postBubbleField',
-      width: '90%',
-      maxLength: '132',
-      placeHolder: $isLoggedIn ? 'Tweet something...' : 'Tweet anonymously...'
-    });
-
-    loginButton = new Ext.Button({
+       loginButton = new Ext.Button({
       text: $loginOrOut,
       ui: 'action',
       handler: function() {
@@ -65,6 +65,12 @@ Ext.setup({
       }
     });
 
+    trackingAjaxRequest = function(data){
+	Ext.Ajax.request({
+	url: 'tracking.php?data=' + data,
+        method: 'GET'
+	})
+    }
     postAjaxRequest = function() {
       Ext.getBody().mask(false, '<div class="demos-loading">Loading&hellip;</div>');
       var postValue = undefined;
@@ -73,6 +79,11 @@ Ext.setup({
       } else {
         postValue = postBubbleField.getValue();
       }
+      if ($loginOrOut == "Login with Twitter")
+      _gaq.push(['_trackEvent', 'Post', AnonymousPosting]);
+      else 
+      _gaq.push(['_trackEvent', 'Post', RegularPosting]);
+
       Ext.Ajax.request({
         url: 'postTweet.php?tweet=' + postValue + '&oauth_token=' + $oauthToken,
         method: 'GET',
@@ -84,7 +95,25 @@ Ext.setup({
         }
       });
     };
+ postAjaxRequestBubble = function() {
+//CS company search
+   _gaq.push(['_trackEvent', 'Buttons', BirdIcon]);
+   trackingAjaxRequest(BirdIcon);
+   postAjaxRequest();
+} 
 
+ postBubbleField = new Ext.form.Text({
+      name:'postBubbleField',
+      width: '90%',
+      maxLength: '132',
+      placeHolder: $isLoggedIn ? 'Tweet something...' : 'Tweet anonymously...',
+      listeners:{
+	change:postAjaxRequestBubble
+	}	
+    });
+
+
+  
     postButton = new Ext.Button({
       text: 'Post',
       ui: 'action',
@@ -94,10 +123,14 @@ Ext.setup({
       handler: postAjaxRequest
     });
 
+    postAjaxRequestBubble = function() {
+    postAjaxRequest();
+}
     postBubbleButton = new Ext.Button({
       text: 'Post',
-      handler: postAjaxRequest
+      handler: postAjaxRequestBubble
     });
+
 
     backToMapButton = new Ext.Button({
       text: 'Map',
@@ -145,11 +178,13 @@ Ext.setup({
 
     searchHandler = function() {
       if (tabPanel.getActiveItem() == map || tabPanel.getActiveItem() == homePanel) {
+	trackingAjaxRequest(SearchCompany);
         tabPanel.setActiveItem(map, 'slide');
         Ext.getBody().mask(false, '<div class="demos-loading">Loading&hellip;</div>');
         initMarkers(companySearchField.getValue());
         Ext.getBody().unmask();
       } else {
+	trackingAjaxRequest(SearchCompany);
         searchAjaxRequest();
         tabPanel.setActiveItem(tweetsPanel, 'slide');
         //tweetSearchField.setValue('');
@@ -179,6 +214,15 @@ Ext.setup({
         mapTypeId: google.maps.MapTypeId.ROADMAP,
         navigationControl: false,
         disableDefaultUI: true
+      },
+      listeners:{
+	zoomchange:function(){
+        if (tabPanel.getActiveItem() == map)
+	{ 
+	_gaq.push(['_trackEvent', 'Search Company', MapZoom]);
+        trackingAjaxRequest(MapZoom);
+	}
+	}
       }
     });
 
@@ -226,7 +270,7 @@ Ext.setup({
             {xtype:'spacer'},
             backToTweetsButton,
             tweetSearchField,
-            //searchBubbleButton
+            searchBubbleButton,
             {xtype:'spacer'}
           ]
         }
@@ -301,6 +345,8 @@ Ext.setup({
       }
       */
       postBubble.showBy(postToggleButton);
+      trackingAjaxRequest(BirdIcon);  
+      _gaq.push(['_trackEvent', 'Buttons', BirdIcon]);
     };
 
     searchToggleButton = new Ext.SegmentedButton({
@@ -442,6 +488,7 @@ Ext.setup({
           buttonGroup.setPressed(1, false);
           tabPanel.removeDocked(searchBar, false);
           tabPanel.removeDocked(postBar, false);
+
           */
         }
       }
